@@ -25,7 +25,7 @@ ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) +
 
     ## `geom_smooth()` using method = 'loess'
 
-![](examples_files/figure-markdown_github/unnamed-chunk-1-1.png)
+![](README_files/figure-markdown_github/unnamed-chunk-1-1.png)
 
 **Here's a chart using the stat\_summary function of ggplot2**
 
@@ -39,7 +39,7 @@ ggplot(data = diamonds) +
   )
 ```
 
-![](examples_files/figure-markdown_github/unnamed-chunk-2-1.png)
+![](README_files/figure-markdown_github/unnamed-chunk-2-1.png)
 
 **Bar chart**
 
@@ -50,4 +50,4 @@ ggplot(data = diamonds) +
   )
 ```
 
-![](examples_files/figure-markdown_github/unnamed-chunk-3-1.png)
+![](README_files/figure-markdown_github/unnamed-chunk-3-1.png)
