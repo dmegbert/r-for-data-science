@@ -45,9 +45,17 @@ ggplot(data = diamonds) +
 
 ``` r
 ggplot(data = diamonds) +
-  geom_bar(
-    mapping = aes(x = cut, y = ..prop.., group = 1)
-  )
+  geom_bar(mapping = aes(x = cut, fill = cut))
 ```
 
 ![](README_files/figure-markdown_github/unnamed-chunk-3-1.png)
+
+**AND a box plot using coord\_flip to better read the x axis labels**
+
+``` r
+ggplot(data = mpg, mapping = aes(x = manufacturer, y = hwy)) + 
+         geom_boxplot() + 
+         coord_flip()
+```
+
+![](README_files/figure-markdown_github/unnamed-chunk-4-1.png)
