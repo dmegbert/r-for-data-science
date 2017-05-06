@@ -59,3 +59,30 @@ ggplot(data = mpg, mapping = aes(x = manufacturer, y = hwy)) +
 ```
 
 ![](README_files/figure-markdown_github/unnamed-chunk-4-1.png)
+
+### Chapter 3 - Data Transformations with dplyr
+
+##### Not a lot to see with this one. Check out lines 114 - 200 in r.for.data.science file if you are interested.
+
+### Here's a visualization showing the relationship between the number of cancelled flights and the median delay per day
+
+``` r
+## relationship between flight delay and cancellations:
+
+flights <- as_tibble(flights)
+
+a <- flights %>%
+  mutate(total.delay = arr_delay + dep_delay) %>%
+  group_by(year, month, day) %>%
+  summarize(cancelled.flights = sum(is.na(dep_time)),
+            median.delay = median(total.delay, na.rm = TRUE)
+            )
+
+ggplot(a) +
+  geom_point(mapping = aes(x = median.delay, y = cancelled.flights, color = factor(month))) + 
+  geom_smooth(mapping = aes(x = median.delay, y = cancelled.flights))
+```
+
+    ## `geom_smooth()` using method = 'loess'
+
+![](README_files/figure-markdown_github/unnamed-chunk-5-1.png)

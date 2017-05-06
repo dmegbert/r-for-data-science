@@ -192,6 +192,119 @@ flights.sml <-  mutate(flights.sml, n(),
 
 ## transmute only keeps the new variables.
 View(flights)
+
+## add variable of minutes since midnight
 since.mid <- mutate(flights, time.since.midnight = (dep_time %/% 100 * 60) + dep_time %% 100)
 View(since.mid)
 since.mid <- mutate(since.mid, time.since.midnight = if_else(time.since.midnight == 1440, 0, time.since.midnight))
+
+air.time <- flights %>%
+  mutate(airtime2 = (((arr_time %/% 100 * 60) + arr_time %% 100)) - 
+           ((dep_time %/% 100 * 60) + dep_time %% 100),
+         dif.airtime = air_time - airtime2) %>%
+  select(arr_time, dep_time, airtime2, air_time, dif.airtime, everything())
+View(air.time)
+
+most.delayed <- flights %>%
+  mutate(delayed.total = dep_delay + arr_delay,
+         delayed.rank = min_rank(desc(delayed.total))) %>%
+  arrange(delayed.rank)
+
+View(most.delayed)
+
+summ.by.day <- flights %>%
+  group_by(year, month, day) %>%
+  summarize(delay = mean(dep_delay, na.rm = TRUE))
+View(summ.by.day)
+
+delays <- flights %>%
+  group_by(dest) %>%
+  summarize(
+    count = n(),
+    dist = mean(distance, na.rm = TRUE),
+    delay = mean(arr_delay, na.rm = TRUE)
+  ) %>%
+  filter(count > 20, dest != "HNL")
+
+not_cancelled <- flights %>%  filter(!is.na(dep_delay), !is.na(arr_delay))
+
+delays <- not_cancelled %>%  
+  group_by(tailnum) %>%  
+  summarize(    
+    delay = mean(arr_delay, na.rm = TRUE),    
+    n = n()
+    )
+
+ggplot(delays, mapping = aes(x = n, y = delay)) +
+  geom_point(alpha = 1/10)
+
+delays %>%  filter(n > 25) %>%  ggplot(mapping = aes(x = n, y = delay)) +    geom_point(alpha = 1/10)
+
+## Batter's UP!!!
+
+batting <- as_tibble(Lahman::Batting)
+
+batters <- batting %>%
+  group_by(playerID) %>%
+  summarize(
+    ba = sum(H, na.rm = TRUE) / sum(AB, na.rm = TRUE), 
+    ab = sum(AB, na.rm = TRUE)
+  )
+
+batters %>%  
+  filter(ab > 100) %>%  
+  ggplot(mapping = aes(x = ab, y = ba)) +
+  geom_point() +
+  geom_smooth(se = FALSE)
+#> `geom_smooth()` using method = 'gam'
+
+batters %>%
+  filter(ab > 1000) %>%
+  arrange(desc(ba))
+
+batters %>%
+  filter(ab > 275) %>%
+  arrange(desc(ba))
+
+## distance a plane flew
+not_cancelled %>%
+  count(tailnum, wt = distance) %>%
+  ggplot(mapping = aes(x = tailnum, y = distance)) + 
+  geom_histogram()
+
+not_cancelled %>%
+  ggplot(mapping = aes(x = tailnum, y = distance)) + 
+  geom_bar()
+
+## How many flights left before 5am?
+not_cancelled %>%
+  group_by(year, month, day) %>%
+  summarize(n_early = sum(dep_time < 500))
+
+## What proportion of flights are delayed by more than an hour?
+
+not_cancelled %>%
+  group_by(year, month, day) %>%
+  summarize(hour_perc = mean(arr_delay > 60)) %>%
+  arrange(desc(hour_perc))
+
+## relationship between flight delay and cancellations:
+
+flights <- as_tibble(flights)
+
+a <- flights %>%
+  mutate(total.delay = arr_delay + dep_delay) %>%
+  group_by(year, month, day) %>%
+  summarize(cancelled.flights = sum(is.na(dep_time)),
+            median.delay = median(total.delay, na.rm = TRUE)
+            )
+
+ggplot(a) +
+  geom_point(mapping = aes(x = median.delay, y = cancelled.flights, color = factor(month))) + 
+  geom_smooth(mapping = aes(x = median.delay, y = cancelled.flights))
+
+
+
+
+
+
